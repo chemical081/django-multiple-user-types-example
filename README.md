@@ -1,43 +1,58 @@
-# Django School
+This is an django based application that teachers can create quizzes and students can sign up and take quizzes related to their interests. </br>
+So, we are gonna be dockerizing this applicaition which means that we are gonna make an image and run this in a container. </br>
+You can follow the steps below:
 
-[![Python Version](https://img.shields.io/badge/python-3.6-brightgreen.svg)](https://python.org)
-[![Django Version](https://img.shields.io/badge/django-2.0-brightgreen.svg)](https://djangoproject.com)
++ First of all we are gonna create a Dockerfile (the name of the file has to be "Dockerfile")
++ and inside the Dockerfile we are gonna write the following code:
+    - We will be needing a base image are we will be using python:3.7 as it is the required version and because we are using django we are using python.
 
-This is an example project to illustrate an implementation of multiple user types. In this Django app, teachers can create quizzes and students can sign up and take quizzes related to their interests.
+        ````Dockerfile
+          FROM python:3.7
+        ````
 
-![Django School Screenshot](https://simpleisbetterthancomplex.com/media/2018/01/teacher-quiz.png)
+    - The developer has already made the list of all the required files inside a text file and named it requirements.txt.
+        * So to copy the required file from the host machine "requirements.txt" to the current directory "." in the container.
 
-Read the blog post [How to Implement Multiple User Types with Django](https://simpleisbetterthancomplex.com/tutorial/2018/01/18/how-to-implement-multiple-user-types-with-django.html).
+          ````Dockerfile
+            COPY requirements.txt requirements.txt
+          ````
 
-## Running the Project Locally
+    - now installing the python packages that are listed inside the requirements.txt
 
-First, clone the repository to your local machine:
+       ````Dockerfile
+         RUN pip install --no-cache-dir -r requirements.txt
+       ````
 
-```bash
-git clone https://github.com/sibtc/django-multiple-user-types-example.git
-```
+    - making a working directory where the commands will be executed
 
-Install the requirements:
+      ````Dockerfile
+        WORKDIR /myapp
+      ````
 
-```bash
-pip install -r requirements.txt
-```
+      NOTE: you can give the working directory your own desired name
 
-Create the database:
+    -now copying all the files and directory from the host machine "." to the container directory "/myapp"
 
-```bash
-python manage.py migrate
-```
+      ````Dockerfile
+        COPY . myapp
+      ````
 
-Finally, run the development server:
+    -now we expose the port which simply means that this is the port that the serber will listen for incoming request
 
-```bash
-python manage.py runserver
-```
+      ````Dockerfile
+        EXPOSE 8080
+      ````
 
-The project will be available at **127.0.0.1:8000**.
+    -Setting the entrypoint for the container to execute the django "manage.py" script.
 
+      ````Dockerfile
+        ENTRYPOINT [ "python", "django_school/manage.py" ]
+      ````
 
-## License
+    -Now instructing django to start the Deployment server "runserver" and bind it to avaliavle ips"0.0.0.0" on port 8080
 
-The source code is released under the [MIT License](https://github.com/sibtc/django-multiple-user-types-example/blob/master/LICENSE).
+      ````Dockerfile
+        CMD [ "runserver", "0.0.0.0:8088" ]
+      ````
+
+  
